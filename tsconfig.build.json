@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "noEmit": false,
+    "rootDir": "",
+    "outDir": "dist",
+
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "isolatedModules": false,
+    "noUnusedParameters": false
+  },
+  "exclude": [
+    "./src/tests/**/*.ts",
+    "./src/**/*.spec.ts"
+  ]
+}
