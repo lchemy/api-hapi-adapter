@@ -66,6 +66,13 @@ describe("plugin", () => {
 			};
 		}
 
+		@route("GET", "/auth/none", "none")
+		none(_: ApiRequest): object {
+			return {
+				success: true
+			};
+		}
+
 		@route("GET", "/auth/test", (auth) => auth === "test")
 		test(_: ApiRequest): object {
 			return {
@@ -120,6 +127,7 @@ describe("plugin", () => {
 
 	it("should echo simple requests", async () => {
 		const res0 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/echo"
 		});
@@ -131,6 +139,7 @@ describe("plugin", () => {
 		});
 
 		const res1 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/echo?a=1&b=2"
 		});
@@ -145,6 +154,7 @@ describe("plugin", () => {
 		});
 
 		const res2 = await server.inject({
+			app: {},
 			method: "POST",
 			url: "http://localhost/echo",
 			payload: {
@@ -161,6 +171,7 @@ describe("plugin", () => {
 		});
 
 		const res3 = await server.inject({
+			app: {},
 			method: "PUT",
 			url: "http://localhost/echo/1/2/3"
 		});
@@ -177,6 +188,7 @@ describe("plugin", () => {
 
 	it("should have the proper metadata set", async () => {
 		const res0 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/metadata/description"
 		});
@@ -185,6 +197,7 @@ describe("plugin", () => {
 		});
 
 		const res1 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/metadata/content-type"
 		});
@@ -194,6 +207,7 @@ describe("plugin", () => {
 
 	it("should catch errors and handle boom errors correctly", async () => {
 		const res0 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/error/boom"
 		});
@@ -205,6 +219,7 @@ describe("plugin", () => {
 		expect(res0.statusCode).toBe(400);
 
 		const res1 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/error/internal"
 		});
@@ -219,6 +234,7 @@ describe("plugin", () => {
 	it("should handle auth properly", async () => {
 		credentials = null;
 		const res0 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/auth/required"
 		});
@@ -231,6 +247,7 @@ describe("plugin", () => {
 
 		credentials = {};
 		const res1 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/auth/required"
 		});
@@ -240,6 +257,7 @@ describe("plugin", () => {
 
 		credentials = null;
 		const res2 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/auth/optional"
 		});
@@ -249,6 +267,7 @@ describe("plugin", () => {
 
 		credentials = {};
 		const res3 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/auth/optional"
 		});
@@ -258,6 +277,7 @@ describe("plugin", () => {
 
 		credentials = null;
 		const res4 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/auth/test"
 		});
@@ -270,6 +290,7 @@ describe("plugin", () => {
 
 		credentials = {};
 		const res5 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/auth/test"
 		});
@@ -282,10 +303,21 @@ describe("plugin", () => {
 
 		credentials = "test";
 		const res6 = await server.inject({
+			app: {},
 			method: "GET",
 			url: "http://localhost/auth/test"
 		});
 		expect(JSON.parse(res6.payload)).toEqual({
+			success: true
+		});
+
+		credentials = null;
+		const res7 = await server.inject({
+			app: {},
+			method: "GET",
+			url: "http://localhost/auth/none"
+		});
+		expect(JSON.parse(res7.payload)).toEqual({
 			success: true
 		});
 	});

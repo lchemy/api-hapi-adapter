@@ -1,12 +1,12 @@
-import { RouteConfiguration } from "@lchemy/api";
+import { Route } from "@lchemy/api";
 import Boom from "boom";
-import { Request, ResponseToolkit, RouteOptions, ServerRoute } from "hapi";
+import { Request, RequestQuery, ResponseToolkit, RouteOptions, ServerRoute } from "hapi";
 
-export function apiRouteToHapiRoute(route: RouteConfiguration): ServerRoute {
-	const config: RouteOptions = {
-		auth: {
+export function apiRouteToHapiRoute(route: Route): ServerRoute {
+	const options: RouteOptions = {
+		auth: (route.auth !== "none" ? {
 			mode: "try"
-		},
+		} : false),
 		description: route.metadata != null ? route.metadata!.description : undefined
 	};
 
@@ -20,7 +20,7 @@ export function apiRouteToHapiRoute(route: RouteConfiguration): ServerRoute {
 		path: route.path,
 		handler: async (request: Request, h: ResponseToolkit) => {
 			try {
-				const query = request.query,
+				const query = request.query as RequestQuery,
 					params = request.params,
 					body = request.payload,
 					auth = request.auth.credentials;
@@ -44,6 +44,6 @@ export function apiRouteToHapiRoute(route: RouteConfiguration): ServerRoute {
 				return err;
 			}
 		},
-		config
+		options
 	};
 }
