@@ -79,6 +79,13 @@ describe("plugin", () => {
 				success: true
 			};
 		}
+
+		@route("GET", "/auth/test2", () => true, {
+			authStrategies: ["test2"]
+		})
+		test2({ auth }: ApiRequest): object {
+			return { auth };
+		}
 	}
 
 	const controllers = [
@@ -107,7 +114,24 @@ describe("plugin", () => {
 				}
 			};
 		});
+		server.auth.scheme("test2", () => {
+			return {
+				authenticate: (_, h) => {
+					if (credentials == null) {
+						return Boom.unauthorized();
+					} else {
+						return h.authenticated({
+							credentials: {
+								...credentials,
+								hello: "world"
+							}
+						});
+					}
+				}
+			};
+		});
 		server.auth.strategy("test", "test");
+		server.auth.strategy("test2", "test2");
 		server.auth.default({
 			mode: "required",
 			strategy: "test"
@@ -319,6 +343,19 @@ describe("plugin", () => {
 		});
 		expect(JSON.parse(res7.payload)).toEqual({
 			success: true
+		});
+
+		credentials = { test: 2 };
+		const res8 = await server.inject({
+			app: {},
+			method: "GET",
+			url: "http://localhost/auth/test2"
+		});
+		expect(JSON.parse(res8.payload)).toEqual({
+			auth: {
+				test: 2,
+				hello: "world"
+			}
 		});
 	});
 });
