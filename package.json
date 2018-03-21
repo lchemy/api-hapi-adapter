@@ -1,7 +1,7 @@
 {
   "name": "@lchemy/api-hapi-adapter",
   "description": "",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "contributors": [
     "Jesse Zhang"
   ],
@@ -21,7 +21,7 @@
     "prepublishOnly": "echo 'Cannot publish the development files. Publish the built files instead.' && exit 1"
   },
   "dependencies": {
-    "@lchemy/api": "^1.0.0-beta.5",
+    "@lchemy/api": "^1.0.0-beta.6",
     "@types/boom": "^7.2.0",
     "@types/hapi": "^17.0.7",
     "boom": "^7.2.0",

@@ -23,12 +23,14 @@ export function apiRouteToHapiRoute(route: Route): ServerRoute {
 			try {
 				const query = request.query as RequestQuery,
 					params = request.params,
+					headers = request.headers,
 					body = request.payload,
 					auth = request.auth.credentials;
 
 				const result = await route.handler({
 					query,
 					params,
+					headers,
 					body,
 					auth
 				});

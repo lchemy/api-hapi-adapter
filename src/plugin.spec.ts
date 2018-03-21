@@ -155,9 +155,11 @@ describe("plugin", () => {
 			method: "GET",
 			url: "http://localhost/echo"
 		});
-		expect(JSON.parse(res0.payload)).toEqual({
+		const res0Payload = JSON.parse(res0.payload);
+		expect(res0Payload).toEqual({
 			params: {},
 			query: {},
+			headers: res0Payload.headers,
 			body: null,
 			auth: credentials
 		});
@@ -167,12 +169,14 @@ describe("plugin", () => {
 			method: "GET",
 			url: "http://localhost/echo?a=1&b=2"
 		});
-		expect(JSON.parse(res1.payload)).toEqual({
+		const res1Payload = JSON.parse(res1.payload);
+		expect(res1Payload).toEqual({
 			params: {},
 			query: {
 				a: "1",
 				b: "2"
 			},
+			headers: res1Payload.headers,
 			body: null,
 			auth: credentials
 		});
@@ -185,9 +189,11 @@ describe("plugin", () => {
 				test: "ing"
 			}
 		});
-		expect(JSON.parse(res2.payload)).toEqual({
+		const res2Payload = JSON.parse(res2.payload);
+		expect(res2Payload).toEqual({
 			params: {},
 			query: {},
+			headers: res2Payload.headers,
 			body: {
 				test: "ing"
 			},
@@ -199,12 +205,34 @@ describe("plugin", () => {
 			method: "PUT",
 			url: "http://localhost/echo/1/2/3"
 		});
-		expect(JSON.parse(res3.payload)).toEqual({
+		const res3Payload = JSON.parse(res3.payload);
+		expect(res3Payload).toEqual({
 			params: {
 				a: "1",
 				b: "2/3"
 			},
 			query: {},
+			headers: res3Payload.headers,
+			body: null,
+			auth: credentials
+		});
+
+		const res4 = await server.inject({
+			app: {},
+			headers: {
+				test: "1"
+			},
+			method: "GET",
+			url: "http://localhost/echo"
+		});
+		const res4Payload = JSON.parse(res4.payload);
+		expect(res4Payload).toEqual({
+			params: {},
+			query: {},
+			headers: {
+				...res4Payload.headers,
+				test: "1"
+			},
 			body: null,
 			auth: credentials
 		});
