@@ -5,7 +5,8 @@ import { Request, RequestQuery, ResponseToolkit, RouteOptions, ServerRoute } fro
 export function apiRouteToHapiRoute(route: Route): ServerRoute {
 	const options: RouteOptions = {
 		auth: (route.auth !== "none" ? {
-			mode: "try"
+			mode: "try",
+			strategies: route.metadata != null ? route.metadata.authStrategies : undefined
 		} : false),
 		description: route.metadata != null ? route.metadata!.description : undefined
 	};
