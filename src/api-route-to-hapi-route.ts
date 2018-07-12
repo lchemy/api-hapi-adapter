@@ -1,6 +1,6 @@
-import { Route } from "@lchemy/api";
+import { ApiResponse, Route } from "@lchemy/api";
 import Boom from "boom";
-import { Request, RequestQuery, ResponseToolkit, RouteOptions, ServerRoute } from "hapi";
+import { Request, RequestQuery, ResponseObject, ResponseToolkit, RouteOptions, ServerRoute } from "hapi";
 
 export function apiRouteToHapiRoute(route: Route): ServerRoute {
 	const options: RouteOptions = {
@@ -35,10 +35,25 @@ export function apiRouteToHapiRoute(route: Route): ServerRoute {
 					auth
 				});
 
-				const response = h.response(result);
-				if (contentType != null) {
-					response.type(contentType);
+				let response: ResponseObject;
+				if (result instanceof ApiResponse) {
+					response = h.response(result.value);
+					response.code(result.statusCode);
+					if (result.contentType != null) {
+						response.type(result.contentType);
+					} else if (contentType != null) {
+						response.type(contentType);
+					}
+					Object.keys(result.headers).forEach((key) => {
+						response.header(key, result.headers[key]);
+					});
+				} else {
+					response = h.response(result);
+					if (contentType != null) {
+						response.type(contentType);
+					}
 				}
+
 				return response;
 			} catch (err) {
 				if (!Boom.isBoom(err)) {

@@ -88,11 +88,35 @@ describe("plugin", () => {
 		}
 	}
 
+	class WrapperController extends Controller {
+		@route("POST", "/wrapper", "optional")
+		@route("POST", "/wrapper-with-default-type", "optional", {
+			contentType: "text/plain"
+		})
+		wrapper(request: ApiRequest): object {
+			const { value, statusCode, contentType, headers } = request.body!;
+			const response = this.respond(value);
+			if (statusCode != null) {
+				response.code(statusCode);
+			}
+			if (contentType != null) {
+				response.type(contentType);
+			}
+			if (headers != null) {
+				Object.keys(headers).forEach((key) => {
+					response.header(key, headers[key]);
+				});
+			}
+			return response;
+		}
+	}
+
 	const controllers = [
 		EchoController,
 		MetadataController,
 		ErrorController,
-		AuthController
+		AuthController,
+		WrapperController
 	];
 
 	let server: Server,
@@ -385,5 +409,53 @@ describe("plugin", () => {
 				hello: "world"
 			}
 		});
+	});
+
+	it("should wrap the response with additional metadata", async () => {
+		const res0 = await server.inject({
+			app: {},
+			method: "POST",
+			url: "http://localhost/wrapper",
+			payload: {
+				value: {
+					test: 1
+				}
+			}
+		});
+		expect(JSON.parse(res0.payload)).toEqual({
+			test: 1
+		});
+		expect(res0.statusCode).toBe(200);
+		expect(res0.headers["content-type"]).toContain("application/json");
+
+		const res1 = await server.inject({
+			app: {},
+			method: "POST",
+			url: "http://localhost/wrapper",
+			payload: {
+				statusCode: 201,
+				value: "test",
+				contentType: "text/plain",
+				headers: {
+					"Some-Header": "1"
+				}
+			}
+		});
+		expect(res1.payload).toEqual("test");
+		expect(res1.statusCode).toBe(201);
+		expect(res1.headers["content-type"]).toContain("text/plain");
+		expect(res1.headers["some-header"]).toEqual("1");
+
+		const res2 = await server.inject({
+			app: {},
+			method: "POST",
+			url: "http://localhost/wrapper-with-default-type",
+			payload: {
+				value: "test"
+			}
+		});
+		expect(res2.payload).toEqual("test");
+		expect(res2.statusCode).toBe(200);
+		expect(res2.headers["content-type"]).toContain("text/plain");
 	});
 });
