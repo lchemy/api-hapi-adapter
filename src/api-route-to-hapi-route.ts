@@ -55,7 +55,7 @@ export function apiRouteToHapiRoute(route: Route): ServerRoute {
 				}
 
 				return response;
-			} catch (err) {
+			} catch (err: any) {
 				if (!Boom.isBoom(err)) {
 					err = Boom.badImplementation(undefined, err);
 				}
